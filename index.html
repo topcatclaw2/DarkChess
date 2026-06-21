@@ -60,6 +60,28 @@
             </select>
           </div>
 
+          <div class="panel-section">
+            <label class="form-label">棋盤樣式</label>
+            <div class="segmented-control" role="group" aria-label="棋盤樣式">
+              <button
+                class="segment-button"
+                :class="{ active: boardTheme === 'classic' }"
+                type="button"
+                @click="setBoardTheme('classic')"
+              >
+                基本棋盤
+              </button>
+              <button
+                class="segment-button"
+                :class="{ active: boardTheme === 'wood' }"
+                type="button"
+                @click="setBoardTheme('wood')"
+              >
+                木質棋盤
+              </button>
+            </div>
+          </div>
+
           <div class="panel-section status-stack">
             <div class="status-row">
               <span>狀態</span>
@@ -107,7 +129,14 @@
               {{ message }}
             </div>
 
-            <div class="board-wrap" aria-label="象棋暗棋棋盤">
+            <div
+              class="board-wrap"
+              :class="{
+                'board-classic': boardTheme === 'classic',
+                'board-wood': boardTheme === 'wood'
+              }"
+              aria-label="象棋暗棋棋盤"
+            >
               <button
                 v-for="(cell, index) in board"
                 :key="cell.id"

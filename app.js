@@ -36,6 +36,7 @@ createApp({
     return {
       gameMode: "pve",
       difficulty: "normal",
+      boardTheme: "classic",
       currentTurn: "human",
       firstPlayer: null,
       playerColors: {},
@@ -86,6 +87,9 @@ createApp({
     this.resetBoard();
   },
   methods: {
+    setBoardTheme(theme) {
+      this.boardTheme = theme;
+    },
     setMode(mode) {
       this.gameMode = mode;
       this.gameStatus = "setup";
