@@ -37,6 +37,7 @@ createApp({
       gameMode: "pve",
       difficulty: "normal",
       boardTheme: "classic",
+      pieceTheme: "classic",
       currentTurn: "human",
       firstPlayer: null,
       playerColors: {},
@@ -51,6 +52,9 @@ createApp({
   computed: {
     isBoardDisabled() {
       return this.gameStatus !== "playing" || this.aiThinking || this.currentTurn === "computer";
+    },
+    pieceBackPath() {
+      return "./assets/pieces/cat/back.png";
     },
     statusText() {
       if (this.gameStatus === "setup") return "尚未開始";
@@ -89,6 +93,9 @@ createApp({
   methods: {
     setBoardTheme(theme) {
       this.boardTheme = theme;
+    },
+    setPieceTheme(theme) {
+      this.pieceTheme = theme;
     },
     setMode(mode) {
       this.gameMode = mode;
@@ -504,6 +511,12 @@ createApp({
     },
     pickBest(items) {
       return items.reduce((best, item) => (item.score > best.score ? item : best), items[0]);
+    },
+    pieceAssetPath(piece) {
+      return `./assets/pieces/cat/${piece.color}-${piece.type}.png`;
+    },
+    pieceAltText(piece) {
+      return `${COLORS[piece.color]}方${piece.label}貓咪棋子`;
     },
     cellClasses(cell, index) {
       return {

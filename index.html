@@ -82,6 +82,28 @@
             </div>
           </div>
 
+          <div class="panel-section">
+            <label class="form-label">棋子樣式</label>
+            <div class="segmented-control" role="group" aria-label="棋子樣式">
+              <button
+                class="segment-button"
+                :class="{ active: pieceTheme === 'classic' }"
+                type="button"
+                @click="setPieceTheme('classic')"
+              >
+                傳統
+              </button>
+              <button
+                class="segment-button"
+                :class="{ active: pieceTheme === 'cat' }"
+                type="button"
+                @click="setPieceTheme('cat')"
+              >
+                貓咪
+              </button>
+            </div>
+          </div>
+
           <div class="panel-section status-stack">
             <div class="status-row">
               <span>狀態</span>
@@ -133,7 +155,8 @@
               class="board-wrap"
               :class="{
                 'board-classic': boardTheme === 'classic',
-                'board-wood': boardTheme === 'wood'
+                'board-wood': boardTheme === 'wood',
+                'piece-theme-cat': pieceTheme === 'cat'
               }"
               aria-label="象棋暗棋棋盤"
             >
@@ -148,9 +171,31 @@
                 :aria-label="cellAriaLabel(cell, index)"
               >
                 <span v-if="!cell.piece" class="empty-dot"></span>
-                <span v-else-if="!cell.revealed" class="piece-back">暗</span>
-                <span v-else class="piece-face" :class="cell.piece.color">
-                  {{ cell.piece.label }}
+                <span
+                  v-else-if="!cell.revealed"
+                  class="piece-back"
+                  :class="{ 'cat-piece-back': pieceTheme === 'cat' }"
+                >
+                  <img
+                    v-if="pieceTheme === 'cat'"
+                    :src="pieceBackPath"
+                    alt="貓掌暗棋蓋牌"
+                    draggable="false"
+                  >
+                  <template v-else>暗</template>
+                </span>
+                <span
+                  v-else
+                  class="piece-face"
+                  :class="[cell.piece.color, { 'cat-piece': pieceTheme === 'cat' }]"
+                >
+                  <img
+                    v-if="pieceTheme === 'cat'"
+                    :src="pieceAssetPath(cell.piece)"
+                    :alt="pieceAltText(cell.piece)"
+                    draggable="false"
+                  >
+                  <template v-else>{{ cell.piece.label }}</template>
                 </span>
               </button>
             </div>
