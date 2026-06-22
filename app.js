@@ -31,6 +31,8 @@ const ACTOR_NAMES = {
   computer: "電腦",
 };
 
+const PIECE_ASSET_BASE = new URL("../assets/pieces/", document.baseURI).href;
+
 createApp({
   data() {
     return {
@@ -54,7 +56,7 @@ createApp({
       return this.gameStatus !== "playing" || this.aiThinking || this.currentTurn === "computer";
     },
     pieceBackPath() {
-      return "./assets/pieces/cat/back.png";
+      return new URL("cat/back.png", PIECE_ASSET_BASE).href;
     },
     statusText() {
       if (this.gameStatus === "setup") return "尚未開始";
@@ -513,7 +515,7 @@ createApp({
       return items.reduce((best, item) => (item.score > best.score ? item : best), items[0]);
     },
     pieceAssetPath(piece) {
-      return `./assets/pieces/cat/${piece.color}-${piece.type}.png`;
+      return new URL(`cat/${piece.color}-${piece.type}.png`, PIECE_ASSET_BASE).href;
     },
     pieceAltText(piece) {
       return `${COLORS[piece.color]}方${piece.label}貓咪棋子`;
