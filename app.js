@@ -37,7 +37,7 @@ createApp({
       gameMode: "pve",
       difficulty: "normal",
       boardTheme: "classic",
-      pieceTheme: "classic",
+      pieceTheme: "cat",
       currentTurn: "human",
       firstPlayer: null,
       playerColors: {},
