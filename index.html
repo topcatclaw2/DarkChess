@@ -153,6 +153,7 @@
 
             <div
               class="board-wrap"
+              ref="boardWrap"
               :class="{
                 'board-classic': boardTheme === 'classic',
                 'board-wood': boardTheme === 'wood',
@@ -165,12 +166,43 @@
                 :key="cell.id"
                 class="board-cell"
                 :class="cellClasses(cell, index)"
+                :data-cell-index="index"
                 type="button"
                 @click="handleCellClick(index)"
                 :disabled="isBoardDisabled"
                 :aria-label="cellAriaLabel(cell, index)"
               >
                 <span v-if="!cell.piece" class="empty-dot"></span>
+                <span
+                  v-else-if="cell.revealing"
+                  class="piece-flip"
+                  @animationend="handleAnimationEnd('reveal')"
+                >
+                  <span
+                    class="piece-flip-side piece-flip-back piece-back"
+                    :class="{ 'cat-piece-back': pieceTheme === 'cat' }"
+                  >
+                    <img
+                      v-if="pieceTheme === 'cat'"
+                      :src="pieceBackPath"
+                      alt="貓掌暗棋蓋牌"
+                      draggable="false"
+                    >
+                    <template v-else>暗</template>
+                  </span>
+                  <span
+                    class="piece-flip-side piece-flip-front piece-face"
+                    :class="[cell.piece.color, { 'cat-piece': pieceTheme === 'cat' }]"
+                  >
+                    <img
+                      v-if="pieceTheme === 'cat'"
+                      :src="pieceAssetPath(cell.piece)"
+                      :alt="pieceAltText(cell.piece)"
+                      draggable="false"
+                    >
+                    <template v-else>{{ cell.piece.label }}</template>
+                  </span>
+                </span>
                 <span
                   v-else-if="!cell.revealed"
                   class="piece-back"
@@ -197,7 +229,31 @@
                   >
                   <template v-else>{{ cell.piece.label }}</template>
                 </span>
+                <span
+                  v-if="animation.type === 'capture' && animation.from === index"
+                  class="capture-source-cover"
+                ></span>
               </button>
+
+              <span
+                v-if="animation.type === 'capture' && animation.overlayStyle"
+                class="capture-overlay"
+                :style="animation.overlayStyle"
+                @animationend="handleAnimationEnd('capture')"
+              >
+                <span
+                  class="piece-face capture-overlay-piece"
+                  :class="[animation.attacker.color, { 'cat-piece': pieceTheme === 'cat' }]"
+                >
+                  <img
+                    v-if="pieceTheme === 'cat'"
+                    :src="pieceAssetPath(animation.attacker)"
+                    :alt="pieceAltText(animation.attacker)"
+                    draggable="false"
+                  >
+                  <template v-else>{{ animation.attacker.label }}</template>
+                </span>
+              </span>
             </div>
 
             <div class="legend-row">
