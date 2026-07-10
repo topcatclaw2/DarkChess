@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" role="img" aria-labelledby="title desc">
+  <title id="title">DarkChess 遊戲畫面示意</title>
+  <desc id="desc">一個暗棋遊戲介面的示意圖，左側為控制面板，右側為棋盤與訊息區。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbf7ed"/>
+      <stop offset="48%" stop-color="#f4efe4"/>
+      <stop offset="100%" stop-color="#e8d6bd"/>
+    </linearGradient>
+    <linearGradient id="board" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c78b4f"/>
+      <stop offset="50%" stop-color="#b87941"/>
+      <stop offset="100%" stop-color="#a85f2f"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fffaf0"/>
+      <stop offset="100%" stop-color="#fbf3e4"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#4b3421" flood-opacity=".18"/>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="900" fill="url(#bg)"/>
+  <ellipse cx="260" cy="120" rx="250" ry="180" fill="#e2b659" opacity=".16"/>
+  <ellipse cx="1120" cy="760" rx="420" ry="220" fill="#b8834a" opacity=".12"/>
+
+  <g filter="url(#shadow)">
+    <rect x="96" y="34" width="330" height="832" rx="14" fill="url(#panel)" stroke="#4c2f1f" stroke-opacity=".12"/>
+    <rect x="118" y="52" width="58" height="58" rx="29" fill="#f6dfb8" stroke="#6f4328" stroke-width="3"/>
+    <text x="147" y="92" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="34" font-weight="800" fill="#b42318">暗</text>
+    <text x="198" y="84" font-family="Noto Serif TC, serif" font-size="42" font-weight="900" fill="#241b16">DarkChess</text>
+    <text x="120" y="124" font-family="Microsoft JhengHei, sans-serif" font-size="18" fill="#8b7c71">貓咪主題的輕量暗棋對戰</text>
+
+    <text x="120" y="182" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#74665d">遊戲模式</text>
+    <rect x="120" y="198" width="286" height="50" rx="8" fill="#ead8bc"/>
+    <text x="194" y="229" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#6b3c24">雙人</text>
+    <text x="321" y="229" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#6b3c24">人機</text>
+
+    <text x="120" y="288" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#74665d">棋盤樣式</text>
+    <rect x="120" y="304" width="286" height="50" rx="8" fill="#ead8bc"/>
+    <text x="180" y="335" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#6b3c24">基本棋盤</text>
+    <text x="311" y="335" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#6b3c24">木質棋盤</text>
+
+    <text x="120" y="394" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#74665d">棋子樣式</text>
+    <rect x="120" y="410" width="286" height="50" rx="8" fill="#ead8bc"/>
+    <text x="184" y="441" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#6b3c24">傳統</text>
+    <text x="321" y="441" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#6b3c24">貓咪</text>
+
+    <g>
+      <rect x="120" y="480" width="286" height="50" rx="8" fill="#fff" stroke="#d9c6b2"/>
+      <text x="134" y="511" font-family="Microsoft JhengHei, sans-serif" font-size="18" fill="#74665d">狀態</text>
+      <text x="381" y="511" text-anchor="end" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#241b16">進行中</text>
+    </g>
+    <g>
+      <rect x="120" y="540" width="286" height="50" rx="8" fill="#fff" stroke="#d9c6b2"/>
+      <text x="134" y="571" font-family="Microsoft JhengHei, sans-serif" font-size="18" fill="#74665d">目前回合</text>
+      <text x="381" y="571" text-anchor="end" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#241b16">玩家</text>
+    </g>
+    <g>
+      <rect x="120" y="600" width="286" height="50" rx="8" fill="#fff" stroke="#d9c6b2"/>
+      <text x="134" y="631" font-family="Microsoft JhengHei, sans-serif" font-size="18" fill="#74665d">陣營</text>
+      <text x="381" y="631" text-anchor="end" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#241b16">紅 / 黑</text>
+    </g>
+
+    <rect x="120" y="674" width="286" height="44" rx="6" fill="#f4efe4" stroke="#4c2f1f" stroke-opacity=".2"/>
+    <text x="263" y="703" text-anchor="middle" font-family="Microsoft JhengHei, sans-serif" font-size="17" font-weight="700" fill="#241b16">開始遊戲</text>
+
+    <text x="120" y="759" font-family="Microsoft JhengHei, sans-serif" font-size="17" fill="#b42318" font-weight="700">紅方剩餘</text>
+    <text x="335" y="759" font-family="Microsoft JhengHei, sans-serif" font-size="17" fill="#241b16" font-weight="700">黑方剩餘</text>
+    <text x="120" y="804" font-family="Noto Serif TC, serif" font-size="32" fill="#241b16">16</text>
+    <text x="335" y="804" font-family="Noto Serif TC, serif" font-size="32" fill="#241b16">16</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="500" y="476" width="836" height="254" rx="14" fill="url(#board)"/>
+    <rect x="524" y="506" width="788" height="48" rx="8" fill="#4b2f1f"/>
+    <text x="918" y="537" text-anchor="middle" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#fff7e4">翻開棋子、移動、吃子</text>
+
+    <g opacity=".28">
+      <rect x="532" y="518" width="772" height="220" rx="10" fill="none" stroke="#fff7e4" stroke-width="2"/>
+      <g stroke="#fff7e4" stroke-width="1.4">
+        <line x1="532" y1="573" x2="1304" y2="573"/>
+        <line x1="532" y1="628" x2="1304" y2="628"/>
+        <line x1="532" y1="683" x2="1304" y2="683"/>
+        <line x1="628" y1="518" x2="628" y2="738"/>
+        <line x1="724" y1="518" x2="724" y2="738"/>
+        <line x1="820" y1="518" x2="820" y2="738"/>
+        <line x1="916" y1="518" x2="916" y2="738"/>
+        <line x1="1012" y1="518" x2="1012" y2="738"/>
+        <line x1="1108" y1="518" x2="1108" y2="738"/>
+        <line x1="1204" y1="518" x2="1204" y2="738"/>
+      </g>
+    </g>
+
+    <g transform="translate(548 588)">
+      <rect width="82" height="82" rx="12" fill="#fff7ea" opacity=".92"/>
+      <circle cx="41" cy="41" r="31" fill="#f3dfbb" stroke="#6f4328" stroke-width="6"/>
+      <text x="41" y="51" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="34" font-weight="800" fill="#b42318">暗</text>
+    </g>
+
+    <g transform="translate(648 588)">
+      <rect width="82" height="82" rx="12" fill="#f7ead3" opacity=".92"/>
+      <text x="41" y="51" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="36" font-weight="900" fill="#1f1b17">貓</text>
+    </g>
+
+    <g transform="translate(748 588)">
+      <rect width="82" height="82" rx="12" fill="#f7ead3" opacity=".92"/>
+      <text x="41" y="51" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="36" font-weight="900" fill="#1f1b17">馬</text>
+    </g>
+
+    <g transform="translate(848 588)">
+      <rect width="82" height="82" rx="12" fill="#f7ead3" opacity=".92"/>
+      <text x="41" y="51" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="36" font-weight="900" fill="#1f1b17">炮</text>
+    </g>
+
+    <g transform="translate(948 588)">
+      <rect width="82" height="82" rx="12" fill="#f7ead3" opacity=".92"/>
+      <text x="41" y="51" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="36" font-weight="900" fill="#1f1b17">將</text>
+    </g>
+
+    <g transform="translate(1048 588)">
+      <rect width="82" height="82" rx="12" fill="#f7ead3" opacity=".92"/>
+      <text x="41" y="51" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="36" font-weight="900" fill="#1f1b17">帥</text>
+    </g>
+
+    <g transform="translate(1148 588)">
+      <rect width="82" height="82" rx="12" fill="#f7ead3" opacity=".92"/>
+      <text x="41" y="51" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="36" font-weight="900" fill="#1f1b17">兵</text>
+    </g>
+
+    <g transform="translate(1248 588)">
+      <rect width="82" height="82" rx="12" fill="#f7ead3" opacity=".92"/>
+      <circle cx="41" cy="41" r="31" fill="none" stroke="#2f6f55" stroke-width="6"/>
+    </g>
+
+    <rect x="540" y="608" width="708" height="46" rx="8" fill="#4b2f1f" opacity=".92"/>
+    <text x="894" y="638" text-anchor="middle" font-family="Microsoft JhengHei, sans-serif" font-size="18" font-weight="700" fill="#fff7e4">目前回合提示與對局訊息</text>
+  </g>
+</svg>
