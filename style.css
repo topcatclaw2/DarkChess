@@ -34,14 +34,14 @@ select {
 
 .app-shell {
   min-height: 100vh;
-  padding: 32px;
+  padding: clamp(20px, 3vw, 48px);
 }
 
 .game-layout {
   display: grid;
-  grid-template-columns: minmax(0, 760px);
-  gap: 18px;
-  max-width: 1080px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+  width: min(100%, 1360px);
   margin: 0 auto;
   align-items: stretch;
 }
@@ -50,7 +50,7 @@ select {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
-  width: min(100%, 360px);
+  width: min(100%, 480px);
   justify-self: center;
   padding: 5px;
   background: rgba(234, 216, 188, 0.88);
@@ -226,14 +226,16 @@ h1 {
 
 .game-stage-layout {
   display: grid;
-  grid-template-columns: minmax(120px, 160px) minmax(0, 760px) minmax(120px, 160px);
-  gap: clamp(12px, 2vw, 24px);
+  grid-template-columns: minmax(170px, 220px) minmax(0, 760px) minmax(170px, 220px);
+  gap: clamp(16px, 2vw, 28px);
+  width: min(100%, 1260px);
+  margin: 0 auto;
   align-items: center;
 }
 
 .captured-rack {
   min-width: 0;
-  padding: 12px;
+  padding: 14px;
   background: rgba(255, 250, 240, 0.88);
   border: 1px solid rgba(76, 47, 31, 0.16);
   border-radius: 8px;
@@ -283,7 +285,7 @@ h1 {
 }
 
 .captured-empty {
-  margin: 13px 0 2px;
+  margin: 12px 0 0;
   color: var(--muted);
   font-size: 0.8rem;
   line-height: 1.55;
@@ -722,19 +724,33 @@ h1 {
 
   .game-layout {
     grid-template-columns: 1fr;
+    width: min(100%, 760px);
   }
 
   .game-stage-layout {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .game-stage-layout .table-top {
     grid-column: 1 / -1;
-    grid-row: 2;
+    grid-row: 1;
   }
 
   .captured-rack {
     min-height: 0;
+    padding: 10px 12px;
+  }
+
+  .captured-piece-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 9px;
+  }
+
+  .captured-empty {
+    margin-top: 9px;
+    font-size: 0.76rem;
   }
 
   .control-panel {
@@ -744,12 +760,39 @@ h1 {
 
 @media (max-width: 520px) {
   .app-shell {
-    padding: 10px;
+    padding: 12px;
   }
 
   .control-panel,
   .table-top {
-    padding: 14px;
+    padding: 12px;
+  }
+
+  .view-switcher {
+    width: 100%;
+  }
+
+  .game-stage-layout {
+    gap: 8px;
+  }
+
+  .captured-rack {
+    padding: 9px;
+  }
+
+  .captured-rack-heading {
+    padding-bottom: 7px;
+    font-size: 0.8rem;
+  }
+
+  .captured-rack-heading strong {
+    width: 23px;
+    height: 23px;
+    font-size: 0.82rem;
+  }
+
+  .captured-piece-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .brand-mark {
