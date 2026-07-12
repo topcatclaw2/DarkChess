@@ -42,6 +42,7 @@ createApp({
       difficulty: "normal",
       boardTheme: "classic",
       pieceTheme: "cat",
+      activeView: "game",
       currentTurn: "human",
       firstPlayer: null,
       playerColors: {},
@@ -106,11 +107,34 @@ createApp({
         { red: 0, black: 0 }
       );
     },
+    capturedPieces() {
+      const remainingByPiece = this.board.reduce((counts, cell) => {
+        if (cell.piece) {
+          const key = `${cell.piece.color}-${cell.piece.type}`;
+          counts[key] = (counts[key] || 0) + 1;
+        }
+        return counts;
+      }, {});
+
+      return ["red", "black"].reduce((captured, color) => {
+        captured[color] = PIECES
+          .filter((piece) => piece.color === color)
+          .flatMap((piece) => {
+            const key = `${piece.color}-${piece.type}`;
+            const capturedCount = piece.count - (remainingByPiece[key] || 0);
+            return Array.from({ length: capturedCount }, () => ({ ...piece }));
+          });
+        return captured;
+      }, { red: [], black: [] });
+    },
   },
   mounted() {
     this.resetBoard();
   },
   methods: {
+    setActiveView(view) {
+      this.activeView = view;
+    },
     setBoardTheme(theme) {
       this.boardTheme = theme;
     },

@@ -14,7 +14,28 @@
   <body>
     <main id="app" class="app-shell">
       <section class="game-layout">
-        <aside class="control-panel">
+        <nav class="view-switcher" aria-label="主要畫面">
+          <button
+            class="view-switch-button"
+            :class="{ active: activeView === 'game' }"
+            type="button"
+            :aria-pressed="activeView === 'game'"
+            @click="setActiveView('game')"
+          >
+            遊戲
+          </button>
+          <button
+            class="view-switch-button"
+            :class="{ active: activeView === 'settings' }"
+            type="button"
+            :aria-pressed="activeView === 'settings'"
+            @click="setActiveView('settings')"
+          >
+            設定
+          </button>
+        </nav>
+
+        <aside v-show="activeView === 'settings'" class="control-panel">
           <div class="brand-block">
             <span class="brand-mark">暗</span>
             <div>
@@ -146,8 +167,34 @@
           </p>
         </aside>
 
-        <section class="board-stage">
-          <div class="table-top">
+        <section v-show="activeView === 'game'" class="board-stage">
+          <div class="game-stage-layout">
+            <aside class="captured-rack red-captured" aria-label="紅方被吃掉的棋子">
+              <div class="captured-rack-heading">
+                <span>紅方被吃</span>
+                <strong>{{ capturedPieces.red.length }}</strong>
+              </div>
+              <div v-if="capturedPieces.red.length" class="captured-piece-list">
+                <span
+                  v-for="(piece, index) in capturedPieces.red"
+                  :key="`red-${piece.type}-${index}`"
+                  class="captured-piece"
+                >
+                  <span class="piece-face" :class="[piece.color, { 'cat-piece': pieceTheme === 'cat' }]">
+                    <img
+                      v-if="pieceTheme === 'cat'"
+                      :src="pieceAssetPath(piece)"
+                      :alt="pieceAltText(piece)"
+                      draggable="false"
+                    >
+                    <template v-else>{{ piece.label }}</template>
+                  </span>
+                </span>
+              </div>
+              <p v-else class="captured-empty">尚未有棋子被吃</p>
+            </aside>
+
+            <div class="table-top">
             <div class="game-message" :class="{ win: gameStatus === 'ended' }">
               {{ message }}
             </div>
@@ -262,6 +309,32 @@
               <span><i class="legend-box legal"></i>可行動</span>
               <span><i class="legend-box hint"></i>蓋牌</span>
             </div>
+          </div>
+
+            <aside class="captured-rack black-captured" aria-label="黑方被吃掉的棋子">
+              <div class="captured-rack-heading">
+                <span>黑方被吃</span>
+                <strong>{{ capturedPieces.black.length }}</strong>
+              </div>
+              <div v-if="capturedPieces.black.length" class="captured-piece-list">
+                <span
+                  v-for="(piece, index) in capturedPieces.black"
+                  :key="`black-${piece.type}-${index}`"
+                  class="captured-piece"
+                >
+                  <span class="piece-face" :class="[piece.color, { 'cat-piece': pieceTheme === 'cat' }]">
+                    <img
+                      v-if="pieceTheme === 'cat'"
+                      :src="pieceAssetPath(piece)"
+                      :alt="pieceAltText(piece)"
+                      draggable="false"
+                    >
+                    <template v-else>{{ piece.label }}</template>
+                  </span>
+                </span>
+              </div>
+              <p v-else class="captured-empty">尚未有棋子被吃</p>
+            </aside>
           </div>
         </section>
       </section>

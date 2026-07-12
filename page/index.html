@@ -14,7 +14,28 @@
   <body>
     <main id="app" class="app-shell">
       <section class="game-layout">
-        <aside class="control-panel">
+        <nav class="view-switcher" aria-label="主要畫面">
+          <button
+            class="view-switch-button"
+            :class="{ active: activeView === 'game' }"
+            type="button"
+            :aria-pressed="activeView === 'game'"
+            @click="setActiveView('game')"
+          >
+            遊戲
+          </button>
+          <button
+            class="view-switch-button"
+            :class="{ active: activeView === 'settings' }"
+            type="button"
+            :aria-pressed="activeView === 'settings'"
+            @click="setActiveView('settings')"
+          >
+            設定
+          </button>
+        </nav>
+
+        <aside v-show="activeView === 'settings'" class="control-panel">
           <div class="brand-block">
             <span class="brand-mark">暗</span>
             <div>
@@ -146,41 +167,93 @@
           </p>
         </aside>
 
-        <section class="board-stage">
-          <div class="table-top">
-            <div class="game-message" :class="{ win: gameStatus === 'ended' }">
-              {{ message }}
-            </div>
-
-            <div
-              class="board-wrap"
-              ref="boardWrap"
-              :class="{
-                'board-classic': boardTheme === 'classic',
-                'board-wood': boardTheme === 'wood',
-                'piece-theme-cat': pieceTheme === 'cat'
-              }"
-              aria-label="象棋暗棋棋盤"
-            >
-              <button
-                v-for="(cell, index) in board"
-                :key="cell.id"
-                class="board-cell"
-                :class="cellClasses(cell, index)"
-                :data-cell-index="index"
-                type="button"
-                @click="handleCellClick(index)"
-                :disabled="isBoardDisabled"
-                :aria-label="cellAriaLabel(cell, index)"
-              >
-                <span v-if="!cell.piece" class="empty-dot"></span>
+        <section v-show="activeView === 'game'" class="board-stage">
+          <div class="game-stage-layout">
+            <aside class="captured-rack red-captured" aria-label="紅方被吃掉的棋子">
+              <div class="captured-rack-heading">
+                <span>紅方被吃</span>
+                <strong>{{ capturedPieces.red.length }}</strong>
+              </div>
+              <div v-if="capturedPieces.red.length" class="captured-piece-list">
                 <span
-                  v-else-if="cell.revealing"
-                  class="piece-flip"
-                  @animationend="handleAnimationEnd('reveal')"
+                  v-for="(piece, index) in capturedPieces.red"
+                  :key="`red-${piece.type}-${index}`"
+                  class="captured-piece"
                 >
+                  <span class="piece-face" :class="[piece.color, { 'cat-piece': pieceTheme === 'cat' }]">
+                    <img
+                      v-if="pieceTheme === 'cat'"
+                      :src="pieceAssetPath(piece)"
+                      :alt="pieceAltText(piece)"
+                      draggable="false"
+                    >
+                    <template v-else>{{ piece.label }}</template>
+                  </span>
+                </span>
+              </div>
+              <p v-else class="captured-empty">尚未有棋子被吃</p>
+            </aside>
+
+            <div class="table-top">
+              <div class="game-message" :class="{ win: gameStatus === 'ended' }">
+                {{ message }}
+              </div>
+
+              <div
+                class="board-wrap"
+                ref="boardWrap"
+                :class="{
+                  'board-classic': boardTheme === 'classic',
+                  'board-wood': boardTheme === 'wood',
+                  'piece-theme-cat': pieceTheme === 'cat'
+                }"
+                aria-label="象棋暗棋棋盤"
+              >
+                <button
+                  v-for="(cell, index) in board"
+                  :key="cell.id"
+                  class="board-cell"
+                  :class="cellClasses(cell, index)"
+                  :data-cell-index="index"
+                  type="button"
+                  @click="handleCellClick(index)"
+                  :disabled="isBoardDisabled"
+                  :aria-label="cellAriaLabel(cell, index)"
+                >
+                  <span v-if="!cell.piece" class="empty-dot"></span>
                   <span
-                    class="piece-flip-side piece-flip-back piece-back"
+                    v-else-if="cell.revealing"
+                    class="piece-flip"
+                    @animationend="handleAnimationEnd('reveal')"
+                  >
+                    <span
+                      class="piece-flip-side piece-flip-back piece-back"
+                      :class="{ 'cat-piece-back': pieceTheme === 'cat' }"
+                    >
+                      <img
+                        v-if="pieceTheme === 'cat'"
+                        :src="pieceBackPath"
+                        alt="貓掌暗棋蓋牌"
+                        draggable="false"
+                      >
+                      <template v-else>暗</template>
+                    </span>
+                    <span
+                      class="piece-flip-side piece-flip-front piece-face"
+                      :class="[cell.piece.color, { 'cat-piece': pieceTheme === 'cat' }]"
+                    >
+                      <img
+                        v-if="pieceTheme === 'cat'"
+                        :src="pieceAssetPath(cell.piece)"
+                        :alt="pieceAltText(cell.piece)"
+                        draggable="false"
+                      >
+                      <template v-else>{{ cell.piece.label }}</template>
+                    </span>
+                  </span>
+                  <span
+                    v-else-if="!cell.revealed"
+                    class="piece-back"
                     :class="{ 'cat-piece-back': pieceTheme === 'cat' }"
                   >
                     <img
@@ -192,7 +265,8 @@
                     <template v-else>暗</template>
                   </span>
                   <span
-                    class="piece-flip-side piece-flip-front piece-face"
+                    v-else
+                    class="piece-face"
                     :class="[cell.piece.color, { 'cat-piece': pieceTheme === 'cat' }]"
                   >
                     <img
@@ -203,65 +277,64 @@
                     >
                     <template v-else>{{ cell.piece.label }}</template>
                   </span>
-                </span>
-                <span
-                  v-else-if="!cell.revealed"
-                  class="piece-back"
-                  :class="{ 'cat-piece-back': pieceTheme === 'cat' }"
-                >
-                  <img
-                    v-if="pieceTheme === 'cat'"
-                    :src="pieceBackPath"
-                    alt="貓掌暗棋蓋牌"
-                    draggable="false"
-                  >
-                  <template v-else>暗</template>
-                </span>
-                <span
-                  v-else
-                  class="piece-face"
-                  :class="[cell.piece.color, { 'cat-piece': pieceTheme === 'cat' }]"
-                >
-                  <img
-                    v-if="pieceTheme === 'cat'"
-                    :src="pieceAssetPath(cell.piece)"
-                    :alt="pieceAltText(cell.piece)"
-                    draggable="false"
-                  >
-                  <template v-else>{{ cell.piece.label }}</template>
-                </span>
-                <span
-                  v-if="animation.type === 'capture' && animation.from === index"
-                  class="capture-source-cover"
-                ></span>
-              </button>
+                  <span
+                    v-if="animation.type === 'capture' && animation.from === index"
+                    class="capture-source-cover"
+                  ></span>
+                </button>
 
-              <span
-                v-if="animation.type === 'capture' && animation.overlayStyle"
-                class="capture-overlay"
-                :style="animation.overlayStyle"
-                @animationend="handleAnimationEnd('capture')"
-              >
                 <span
-                  class="piece-face capture-overlay-piece"
-                  :class="[animation.attacker.color, { 'cat-piece': pieceTheme === 'cat' }]"
+                  v-if="animation.type === 'capture' && animation.overlayStyle"
+                  class="capture-overlay"
+                  :style="animation.overlayStyle"
+                  @animationend="handleAnimationEnd('capture')"
                 >
-                  <img
-                    v-if="pieceTheme === 'cat'"
-                    :src="pieceAssetPath(animation.attacker)"
-                    :alt="pieceAltText(animation.attacker)"
-                    draggable="false"
+                  <span
+                    class="piece-face capture-overlay-piece"
+                    :class="[animation.attacker.color, { 'cat-piece': pieceTheme === 'cat' }]"
                   >
-                  <template v-else>{{ animation.attacker.label }}</template>
+                    <img
+                      v-if="pieceTheme === 'cat'"
+                      :src="pieceAssetPath(animation.attacker)"
+                      :alt="pieceAltText(animation.attacker)"
+                      draggable="false"
+                    >
+                    <template v-else>{{ animation.attacker.label }}</template>
+                  </span>
                 </span>
-              </span>
+              </div>
+
+              <div class="legend-row">
+                <span><i class="legend-box selected"></i>已選取</span>
+                <span><i class="legend-box legal"></i>可行動</span>
+                <span><i class="legend-box hint"></i>蓋牌</span>
+              </div>
             </div>
 
-            <div class="legend-row">
-              <span><i class="legend-box selected"></i>已選取</span>
-              <span><i class="legend-box legal"></i>可行動</span>
-              <span><i class="legend-box hint"></i>蓋牌</span>
-            </div>
+            <aside class="captured-rack black-captured" aria-label="黑方被吃掉的棋子">
+              <div class="captured-rack-heading">
+                <span>黑方被吃</span>
+                <strong>{{ capturedPieces.black.length }}</strong>
+              </div>
+              <div v-if="capturedPieces.black.length" class="captured-piece-list">
+                <span
+                  v-for="(piece, index) in capturedPieces.black"
+                  :key="`black-${piece.type}-${index}`"
+                  class="captured-piece"
+                >
+                  <span class="piece-face" :class="[piece.color, { 'cat-piece': pieceTheme === 'cat' }]">
+                    <img
+                      v-if="pieceTheme === 'cat'"
+                      :src="pieceAssetPath(piece)"
+                      :alt="pieceAltText(piece)"
+                      draggable="false"
+                    >
+                    <template v-else>{{ piece.label }}</template>
+                  </span>
+                </span>
+              </div>
+              <p v-else class="captured-empty">尚未有棋子被吃</p>
+            </aside>
           </div>
         </section>
       </section>
