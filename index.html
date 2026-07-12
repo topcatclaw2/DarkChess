@@ -200,6 +200,26 @@
             </div>
 
             <div
+              v-if="gameStatus === 'ended' && gameResult"
+              class="game-result-backdrop"
+              role="presentation"
+            >
+              <section
+                class="game-result-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="game-result-title"
+              >
+                <span class="game-result-kicker">本局結束</span>
+                <h2 id="game-result-title">{{ gameResult.winner }}獲勝！</h2>
+                <p>{{ gameResult.reason }}</p>
+                <button class="btn btn-dark game-result-restart" type="button" @click="startGame">
+                  重新開始
+                </button>
+              </section>
+            </div>
+
+            <div
               class="board-wrap"
               ref="boardWrap"
               :class="{

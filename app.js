@@ -51,6 +51,7 @@ createApp({
       legalMoves: [],
       gameStatus: "setup",
       message: "選擇模式後開始遊戲。",
+      gameResult: null,
       aiThinking: false,
       animation: {
         type: null,
@@ -65,6 +66,7 @@ createApp({
         overlayStyle: null,
       },
       animationTimer: null,
+      computerTimer: null,
     };
   },
   computed: {
@@ -149,8 +151,10 @@ createApp({
       this.selectedPiece = null;
       this.legalMoves = [];
       this.clearAnimation();
+      this.cancelComputerTimer();
       this.currentTurn = mode === "pve" ? "human" : "player1";
       this.message = "選擇模式後開始遊戲。";
+      this.gameResult = null;
       this.resetBoard();
     },
     startGame() {
@@ -161,6 +165,8 @@ createApp({
       this.gameStatus = "playing";
       this.aiThinking = false;
       this.clearAnimation();
+      this.cancelComputerTimer();
+      this.gameResult = null;
 
       if (this.gameMode === "pve") {
         this.firstPlayer = Math.random() < 0.5 ? "human" : "computer";
@@ -405,9 +411,7 @@ createApp({
     finishTurn() {
       const winner = this.getWinner();
       if (winner) {
-        this.gameStatus = "ended";
-        this.message = `${this.getActorByColor(winner)}獲勝！`;
-        this.clearSelection();
+        this.endGame(this.getActorByColor(winner));
         return;
       }
 
@@ -415,8 +419,7 @@ createApp({
       const actions = this.getAllLegalActions(this.currentTurn);
       if (!actions.length) {
         const winnerActor = this.getNextTurn();
-        this.gameStatus = "ended";
-        this.message = `${ACTOR_NAMES[this.currentTurn]}沒有合法動作，${ACTOR_NAMES[winnerActor]}獲勝！`;
+        this.endGame(ACTOR_NAMES[winnerActor], `${ACTOR_NAMES[this.currentTurn]}沒有合法動作`);
         return;
       }
 
@@ -433,6 +436,14 @@ createApp({
       if (this.remainingCount.red === 0) return "black";
       if (this.remainingCount.black === 0) return "red";
       return null;
+    },
+    endGame(winner, reason = "對手的棋子已全數被吃掉") {
+      this.gameStatus = "ended";
+      this.aiThinking = false;
+      this.cancelComputerTimer();
+      this.clearSelection();
+      this.gameResult = { winner, reason };
+      this.message = `${winner}獲勝！`;
     },
     getActorByColor(color) {
       const match = Object.entries(this.playerColors).find(([, actorColor]) => actorColor === color);
@@ -542,9 +553,17 @@ createApp({
       if (this.gameStatus !== "playing") return;
       this.aiThinking = true;
       this.message = "電腦思考中...";
-      window.setTimeout(() => {
+      this.cancelComputerTimer();
+      this.computerTimer = window.setTimeout(() => {
+        this.computerTimer = null;
         this.takeComputerTurn();
       }, 650);
+    },
+    cancelComputerTimer() {
+      if (this.computerTimer !== null) {
+        window.clearTimeout(this.computerTimer);
+        this.computerTimer = null;
+      }
     },
     takeComputerTurn() {
       if (this.gameStatus !== "playing" || this.currentTurn !== "computer") {
@@ -556,8 +575,7 @@ createApp({
       this.aiThinking = false;
 
       if (!action) {
-        this.gameStatus = "ended";
-        this.message = "電腦沒有合法動作，玩家獲勝！";
+        this.endGame("玩家", "電腦沒有合法動作");
         return;
       }
 
