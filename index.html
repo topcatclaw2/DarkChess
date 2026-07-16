@@ -328,6 +328,14 @@
               <span><i class="legend-box selected"></i>已選取</span>
               <span><i class="legend-box legal"></i>可行動</span>
               <span><i class="legend-box hint"></i>蓋牌</span>
+              <button
+                v-if="gameStatus === 'setup'"
+                class="btn btn-dark quick-start-button"
+                type="button"
+                @click="startGame"
+              >
+                快速開始
+              </button>
             </div>
           </div>
 
