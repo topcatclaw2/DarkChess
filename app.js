@@ -34,6 +34,8 @@ const ACTOR_NAMES = {
 const SCRIPT_BASE_URL = document.currentScript?.src || document.baseURI;
 const PIECE_ASSET_BASE = new URL("./assets/pieces/", SCRIPT_BASE_URL).href;
 const ACTION_ANIMATION_MS = { reveal: 420, capture: 360 };
+const CHASE_CYCLE_LENGTH = 4;
+const FORBIDDEN_CHASE_REPETITIONS = 6;
 
 createApp({
   data() {
@@ -47,6 +49,7 @@ createApp({
       firstPlayer: null,
       playerColors: {},
       board: [],
+      moveHistory: [],
       selectedPiece: null,
       legalMoves: [],
       gameStatus: "setup",
@@ -184,6 +187,7 @@ createApp({
       PIECES.forEach((piece) => {
         for (let i = 0; i < piece.count; i += 1) {
           deck.push({
+            id: `piece-${deck.length}`,
             color: piece.color,
             type: piece.type,
             label: piece.label,
@@ -194,6 +198,7 @@ createApp({
       });
 
       this.shuffle(deck);
+      this.moveHistory = [];
       this.board = deck.map((piece, index) => ({
         id: `${Date.now()}-${index}-${piece.color}-${piece.label}`,
         piece,
@@ -283,6 +288,12 @@ createApp({
       const target = this.board[to];
       if (!source.piece || !source.revealed || this.isAnimating) return false;
 
+      if (this.isForbiddenChaseMove(from, to, this.currentTurn)) {
+        this.message = "相同的追逐步法已連續來回 6 次，請改走其他合法步。";
+        this.clearSelection();
+        return false;
+      }
+
       const actionText = target.piece
         ? `${ACTOR_NAMES[this.currentTurn]}以「${source.piece.label}」吃掉「${target.piece.label}」。`
         : `${ACTOR_NAMES[this.currentTurn]}移動「${source.piece.label}」。`;
@@ -305,6 +316,7 @@ createApp({
       }
 
       target.piece = source.piece;
+      this.recordCompletedMove(from, to, this.currentTurn, false);
       target.revealed = true;
       source.piece = null;
       source.revealed = false;
@@ -337,6 +349,7 @@ createApp({
         if (!cell?.piece) return this.clearAnimation();
         cell.revealing = false;
         cell.revealed = true;
+        this.moveHistory = [];
         this.assignColorOnFirstReveal(cell.piece.color);
         this.message = `${ACTOR_NAMES[this.currentTurn]}翻出${COLORS[cell.piece.color]}方「${cell.piece.label}」。`;
         const skipTurn = this.animation.skipTurn;
@@ -348,6 +361,7 @@ createApp({
       const source = this.board[this.animation.from];
       const target = this.board[this.animation.to];
       if (!source?.piece || !target) return this.clearAnimation();
+      this.recordCompletedMove(this.animation.from, this.animation.to, this.currentTurn, true);
       target.piece = source.piece;
       target.revealed = true;
       source.piece = null;
@@ -423,6 +437,10 @@ createApp({
         return;
       }
 
+      if (this.hasForbiddenChaseMove(this.currentTurn) && this.currentTurn !== "computer") {
+        this.message = "相同的追逐步法已連續來回 6 次，請改走其他合法步。";
+      }
+
       if (this.currentTurn === "computer") {
         this.queueComputerMove();
       }
@@ -453,15 +471,61 @@ createApp({
       const cell = this.board[index];
       if (!cell.piece || !cell.revealed) return [];
 
+      let moves;
       if (cell.piece.type === "cannon") {
-        return this.getCannonMoves(index);
+        moves = this.getCannonMoves(index);
+      } else {
+        moves = this.getAdjacentIndexes(index).filter((targetIndex) => {
+          const target = this.board[targetIndex];
+          if (!target.piece) return true;
+          return target.revealed && this.canCapture(cell.piece, target.piece);
+        });
       }
 
-      return this.getAdjacentIndexes(index).filter((targetIndex) => {
-        const target = this.board[targetIndex];
-        if (!target.piece) return true;
-        return target.revealed && this.canCapture(cell.piece, target.piece);
-      });
+      return moves.filter((targetIndex) => !this.isForbiddenChaseMove(index, targetIndex, this.currentTurn));
+    },
+    recordCompletedMove(from, to, actor, captured) {
+      if (captured) {
+        this.moveHistory = [];
+        return;
+      }
+
+      const piece = this.board[from]?.piece;
+      if (!piece) return;
+      this.moveHistory.push({ actor, pieceId: piece.id, from, to });
+      this.moveHistory = this.moveHistory.slice(-(FORBIDDEN_CHASE_REPETITIONS * CHASE_CYCLE_LENGTH + 1));
+    },
+    isForbiddenChaseMove(from, to, actor) {
+      const historyLength = FORBIDDEN_CHASE_REPETITIONS * CHASE_CYCLE_LENGTH + 1;
+      if (this.moveHistory.length < historyLength) return false;
+
+      const pattern = this.getRepeatedChasePattern();
+      if (!pattern) return false;
+
+      const piece = this.board[from]?.piece;
+      if (!piece) return false;
+      return this.matchesChaseAction({ actor, pieceId: piece.id, from, to }, pattern[1]);
+    },
+    hasForbiddenChaseMove(actor) {
+      const pattern = this.getRepeatedChasePattern();
+      return Boolean(pattern && actor === pattern[1].actor);
+    },
+    getRepeatedChasePattern() {
+      const historyLength = FORBIDDEN_CHASE_REPETITIONS * CHASE_CYCLE_LENGTH + 1;
+      if (this.moveHistory.length < historyLength) return null;
+
+      const history = this.moveHistory.slice(-historyLength);
+      const pattern = history.slice(0, CHASE_CYCLE_LENGTH);
+      const repeatsPattern = history.every((action, index) => (
+        this.matchesChaseAction(action, pattern[index % CHASE_CYCLE_LENGTH])
+      ));
+      return repeatsPattern ? pattern : null;
+    },
+    matchesChaseAction(action, expected) {
+      return action.actor === expected.actor &&
+        action.pieceId === expected.pieceId &&
+        action.from === expected.from &&
+        action.to === expected.to;
     },
     getAdjacentIndexes(index) {
       const row = Math.floor(index / COLS);
