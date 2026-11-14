@@ -496,22 +496,19 @@ createApp({
       this.moveHistory = this.moveHistory.slice(-(FORBIDDEN_CHASE_REPETITIONS * CHASE_CYCLE_LENGTH + 1));
     },
     isForbiddenChaseMove(from, to, actor) {
-      const historyLength = FORBIDDEN_CHASE_REPETITIONS * CHASE_CYCLE_LENGTH + 1;
-      if (this.moveHistory.length < historyLength) return false;
-
-      const pattern = this.getRepeatedChasePattern();
-      if (!pattern) return false;
+      const chase = this.getRepeatedChasePattern();
+      if (!chase) return false;
 
       const piece = this.board[from]?.piece;
       if (!piece) return false;
-      return this.matchesChaseAction({ actor, pieceId: piece.id, from, to }, pattern[1]);
+      return this.matchesChaseAction({ actor, pieceId: piece.id, from, to }, chase.forbiddenAction);
     },
     hasForbiddenChaseMove(actor) {
-      const pattern = this.getRepeatedChasePattern();
-      return Boolean(pattern && actor === pattern[1].actor);
+      const chase = this.getRepeatedChasePattern();
+      return Boolean(chase && actor === chase.forbiddenAction.actor);
     },
     getRepeatedChasePattern() {
-      const historyLength = FORBIDDEN_CHASE_REPETITIONS * CHASE_CYCLE_LENGTH + 1;
+      const historyLength = FORBIDDEN_CHASE_REPETITIONS * CHASE_CYCLE_LENGTH;
       if (this.moveHistory.length < historyLength) return null;
 
       const history = this.moveHistory.slice(-historyLength);
@@ -519,7 +516,32 @@ createApp({
       const repeatsPattern = history.every((action, index) => (
         this.matchesChaseAction(action, pattern[index % CHASE_CYCLE_LENGTH])
       ));
-      return repeatsPattern ? pattern : null;
+      if (!repeatsPattern) return null;
+
+      const chaserActionIndex = this.getChaserActionIndex(pattern);
+      if (chaserActionIndex === null) return null;
+      return {
+        pattern,
+        forbiddenAction: pattern[chaserActionIndex],
+      };
+    },
+    getChaserActionIndex(pattern) {
+      const [first, second] = pattern;
+      const distance = (firstIndex, secondIndex) => {
+        const firstRow = Math.floor(firstIndex / COLS);
+        const firstCol = firstIndex % COLS;
+        const secondRow = Math.floor(secondIndex / COLS);
+        const secondCol = secondIndex % COLS;
+        return Math.abs(firstRow - secondRow) + Math.abs(firstCol - secondCol);
+      };
+
+      const startingDistance = distance(first.from, second.from);
+      const afterFirstMove = distance(first.to, second.from);
+      if (afterFirstMove < startingDistance) return 0;
+
+      const afterSecondMove = distance(first.to, second.to);
+      if (afterSecondMove < afterFirstMove) return 1;
+      return null;
     },
     matchesChaseAction(action, expected) {
       return action.actor === expected.actor &&
